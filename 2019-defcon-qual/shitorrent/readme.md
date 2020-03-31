@@ -47,6 +47,7 @@ create two files at `/etc/xinetd.d/defcon1` and `/etc/xinetd.d/defcon2`
 defcon1 file
 
 ```
+service defcon1
 {
 	socket_type	= stream
 	protocol	= tcp
@@ -60,6 +61,7 @@ defcon1 file
 ```
 defcon2 file
 ```
+service defcon2
 {
 	socket_type	= stream
 	protocol	= tcp
